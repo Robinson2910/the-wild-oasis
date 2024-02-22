@@ -1,0 +1,29 @@
+to reuse piece of ui we use components and props
+
+props acts as an api ,which is exposed to user
+
+children prop can be used to customize content
+
+Custom hooks are used for reusuing stateful logic
+
+to reuse ui and stateful logic
+
+we have two advanced patters
+
+1.Render props pattern
+
+user of component has complete control over what the component actually renders,by passing in a function that tells component what to render
+
+was more common before hooks but still useful
+
+So the render prop pattern is all
+
+about passing in a prop called render,
+
+which is a function that a component uses
+
+to know what it should render and how to do it.
+
+2.Compound component pattern
+
+For very self contained components taht need/want to manage their fancy super-components

@@ -1,0 +1,10 @@
+//tell eslint to extend with react application rules
+
+{
+  "extends": "react-app",
+  "rules": {
+    // Add or override specific rules for your project
+    "no-unused-vars": "warn",
+    "react/prop-types": "off"
+  }
+}

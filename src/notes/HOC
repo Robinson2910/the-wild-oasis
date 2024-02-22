@@ -1,0 +1,81 @@
+**Title: Higher Order Component Pattern in React**
+
+**Introduction:**
+- Higher Order Component (HOC) Pattern, another advanced React pattern.
+- Not as crucial as some other patterns but important to understand.
+- HOCs are components that take in another component and return an enhanced version of it.
+- Useful when dealing with third-party libraries that expose HOCs.
+
+**Example Scenario:**
+- Suppose you have a product list component from a third-party library.
+- You want to add toggle functionalities to this component, but you can't modify it directly.
+
+**Creating a Higher Order Component:**
+- HOC file named `withToggles.js`.
+- Convention: HOC often named with the `with` keyword.
+  
+```jsx
+// withToggles.js
+import React from 'react';
+
+const withToggles = (WrappedComponent) => {
+  return class WithToggles extends React.Component {
+    render() {
+      // Logic for toggles or enhancements
+      return (
+        //code for 
+        <WrappedComponent {...this.props} />
+        // Spread props to the wrapped component
+      );
+    }
+  };
+};
+
+export default withToggles;
+```
+
+**Using the Higher Order Component:**
+- Instantiate a product list with toggles.
+  
+```jsx
+// App.js
+import React from 'react';
+import ProductList from 'thirdPartyLibrary/ProductList'; // Assume third-party library component
+import withToggles from './withToggles'; // Import the HOC
+
+// Create a new component with toggles
+const ProductListWithToggles = withToggles(ProductList);
+
+class App extends React.Component {
+  render() {
+    return (
+      <div>
+        {/* Original product list */}
+        <div className="col-2">
+          <ProductList title="Products" items={products} />
+        </div>
+
+        {/* Enhanced product list with toggles */}
+        <div className="col-2">
+          <ProductListWithToggles title="Products Higher Order Component" items={products} />
+        </div>
+      </div>
+    );
+  }
+}
+
+export default App;
+```
+
+**Explanation:**
+- `withToggles` is a function that takes a component (`WrappedComponent`) and returns a new component (`WithToggles`) with additional functionality.
+- The new component renders the wrapped component (`<WrappedComponent {...this.props} />`) along with any enhancements.
+- In this example, the enhanced component has toggles added to it.
+
+**Conclusion:**
+- HOCs used to be crucial before React Hooks.
+- Libraries may provide HOCs for extending functionality.
+- Understanding how to use and recognize HOC patterns can be beneficial.
+
+**Next Topic: Compound Component Pattern**
+- Move on to learn the Compound Component Pattern, considered one of the most important React patterns.

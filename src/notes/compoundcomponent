@@ -1,0 +1,184 @@
+A better approach with Compound Components
+Compound components are a pattern in React, where several components are used together such that they share an implicit state that allows them to communicate with each other in the background. This pattern is used when multiple components work together to have a shared state and handle logic together. An example of compound components can be seen in HTML with the <select> and <option> elements. They don't do much on their own, but together they allow you to create a complete experience. When you click on an option, select knows which option you clicked. Like select and option, the components share the state on their own, so you don't have to explicitly configure them.
+
+Compound components provide a more flexible way to share state within React applications, which makes it easier to maintain and debug your apps.
+
+Here’s an example of how compound components might look in a code snippet:
+
+import React from ‘react’
+import { Dropdown } from ‘semantic-ui-react’
+
+const DropdownExampleDropdown = () => (
+<Dropdown text='File'>
+<Dropdown.Menu>
+<Dropdown.Item text='New' />
+<Dropdown.Item text='Open…' description='ctrl + o' />
+<Dropdown.Item text='Save as…' description='ctrl + s' />
+<Dropdown.Item text='Rename' description='ctrl + r' />
+<Dropdown.Item text='Make a copy' />
+<Dropdown.Item icon='folder' text='Move to folder' />
+<Dropdown.Item icon='trash' text='Move to trash' />
+<Dropdown.Divider />
+<Dropdown.Item text='Download As…' />
+<Dropdown.Item text='Publish To Web' />
+<Dropdown.Item text='E-mail Collaborators' />
+</Dropdown.Menu>
+</Dropdown>
+)
+export default DropdownExampleDropdown
+
+import styled from "styled-components";
+import BookingDataBox from "../../features/bookings/BookingDataBox";
+
+import Row from "../../ui/Row";
+import Heading from "../../ui/Heading";
+import ButtonGroup from "../../ui/ButtonGroup";
+import Button from "../../ui/Button";
+import ButtonText from "../../ui/ButtonText";
+
+import { useMoveBack } from "../../hooks/useMoveBack";
+import { useBooking } from "../bookings/useBooking";
+import Spinner from "../../ui/Spinner";
+import { useEffect, useState } from "react";
+import CheckBox from "../../ui/Checkbox";
+import { formatCurrency } from "../../utils/helpers";
+// import { useCheckin } from "./useCheckin";
+import { useCheckin } from "./useCheckIn";
+import { useSettings } from "../settings/useSettings";
+import { useDeleteBooking } from "./useDeleteBooking";
+
+const Box = styled.div`  /* Box */
+  background-color: var(--color-grey-0);
+  border: 1px solid var(--color-grey-100);
+  border-radius: var(--border-radius-md);
+  padding: 2.4rem 4rem;`;
+
+function CheckinBooking() {
+const [confirmPaid, setConfirmPaid] =
+useState(false);
+const [addBreakfast, setBreakfast] =
+useState(false);
+
+const { booking, isLoading } = useBooking();
+const {
+settings,
+isLoading: isLoadingSettings,
+} = useSettings();
+useEffect(() => {
+setConfirmPaid(booking?.isPaid ?? false);
+}, [booking]);
+
+const moveBack = useMoveBack();
+const { checkin, isCheckingIn } = useCheckin();
+const { checkin, isCheckingIn } =
+useDeleteBooking();
+
+if (isLoading || isLoadingSettings)
+return <Spinner />;
+const {
+id: bookingId,
+guests,
+totalPrice,
+numGuests,
+hasBreakfast,
+numNights,
+} = booking;
+const optionalBreakfastPrice =
+settings.breakfastPrice _
+numNights _
+numGuests;
+function handleCheckin() {
+if (!confirmPaid) return;
+
+    if (addBreakfast) {
+      checkin({
+        bookingId,
+        breakfast: {
+          hasBreakfast: true,
+          extraPrice: optionalBreakfastPrice,
+          totalPrice:
+            totalPrice + optionalBreakfastPrice,
+        },
+      });
+    } else {
+      checkin({ bookingId, breakfast: {} });
+    }
+
+}
+
+return (
+<>
+<Row type="horizontal">
+<Heading as="h1">
+Check in booking #{bookingId}
+</Heading>
+<ButtonText onClick={moveBack}>
+&larr; Back
+</ButtonText>
+</Row>
+
+      <BookingDataBox booking={booking} />
+      {!hasBreakfast && (
+        <Box>
+          <CheckBox
+            checked={addBreakfast}
+            onChange={() => {
+              setBreakfast((add) => !add);
+              setConfirmPaid(false);
+            }}
+            id="breakfast"
+          >
+            Want to add Breakfast for{" "}
+            {optionalBreakfastPrice}?
+          </CheckBox>
+        </Box>
+      )}
+      <Box>
+        <CheckBox
+          checked={confirmPaid}
+          onChange={() =>
+            setConfirmPaid((confirm) => !confirm)
+          }
+          disabled={confirmPaid || isCheckingIn}
+          id="confirm"
+        >
+          I confirm that {guests.fullName} has
+          paid the total amount{" "}
+          {!addBreakfast
+            ? formatCurrency(totalPrice)
+            : `${formatCurrency(
+                totalPrice +
+                  optionalBreakfastPrice
+              )} (${formatCurrency(
+                totalPrice
+              )}+${formatCurrency(
+                optionalBreakfastPrice
+              )})`}
+        </CheckBox>
+      </Box>
+      <ButtonGroup>
+        <Button
+          onClick={handleCheckin}
+          disabled={!confirmPaid || isCheckingIn}
+        >
+          Check in booking #{bookingId}
+        </Button>
+        <Button
+          onClick={handleCheckin}
+          disabled={!confirmPaid || isCheckingIn}
+        >
+          Deletre
+        </Button>
+        <Button
+          variation="secondary"
+          onClick={moveBack}
+        >
+          Back
+        </Button>
+      </ButtonGroup>
+    </>
+
+);
+}
+
+export default CheckinBooking;

@@ -1,0 +1,24 @@
+// whenever the component using the query state is unmounted
+//query state is set to unactive then after it is mounted it will refetched and set to active and then stale
+
+//when state becomes stale,we need to invalidate,if we want to refetch data
+//like while adding something to database or deleting we can use this
+
+// n React Query, besides using invalidateQueries to manually mark a query as stale, there are a few other ways to trigger a refetch of data:
+
+// Using the refetch function:
+
+// The query object returned by useQuery provides a refetch function that you can use to manually trigger a refetch.
+// jsx
+// Copy code
+// const { data, refetch } = useQuery('blogPosts', fetchBlogPosts);
+
+// // ...
+
+// <button onClick={() => refetch()}>Refresh</button>
+// This approach is useful when you want to explicitly trigger a refetch in response to a user action or some other event.
+
+// Using the onSettled callback:
+
+// You can use the onSettled callback to perform actions after a query has settled, regardless of whether it was successful or encountered an error. This can be used to trigger a refetch.
+// jsx
